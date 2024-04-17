@@ -41,8 +41,12 @@ class RegisterActivity : AppCompatActivity() {
         ){
             if(ValidationUtils.isValidEmail(email)){
                 val user = User(username = username, email = email.trim(), password = password)
-                db.registerUser(user)
-                Toast.makeText(this,"User registered...!", Toast.LENGTH_LONG).show()
+                val isSuccess = db.registerUser(user)
+                if(isSuccess){
+                    Toast.makeText(this,"Registration success!", Toast.LENGTH_LONG).show()
+                }else {
+                    Toast.makeText(this,"Registration failed!", Toast.LENGTH_LONG).show()
+                }
             }else{
                 Toast.makeText(this,"Invalid email format", Toast.LENGTH_SHORT).show()
             }

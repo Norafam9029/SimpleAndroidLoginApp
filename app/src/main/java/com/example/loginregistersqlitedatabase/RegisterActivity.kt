@@ -23,10 +23,15 @@ class RegisterActivity : AppCompatActivity() {
         db = DatabaseHelper(this)
         binding.tvLogin.setOnClickListener{
             startActivity(Intent(this,LoginActivity::class.java))
+
+            binding.textInputUsername.text?.clear()
+            binding.textInputEmail.text?.clear()
+            binding.textInputPassword.text?.clear()
         }
 
         binding.btnRegister.setOnClickListener{
             registerUser()
+            binding.textInputPassword.text?.clear()
         }
     }
 
@@ -44,6 +49,10 @@ class RegisterActivity : AppCompatActivity() {
                 val isSuccess = db.registerUser(user)
                 if(isSuccess){
                     Toast.makeText(this,"Registration success!", Toast.LENGTH_LONG).show()
+                    val i = Intent(this,RegisterSuccessfullActivity::class.java)
+                    i.putExtra("EMAIL_DATA", email)
+                    startActivity(i)
+
                 }else {
                     Toast.makeText(this,"Registration failed!", Toast.LENGTH_LONG).show()
                 }

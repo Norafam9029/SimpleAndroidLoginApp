@@ -25,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
 
         binding.btnLogin.setOnClickListener{
             loginUser()
+            binding.textInputPassword.text?.clear()
         }
     }
 
@@ -50,6 +51,5 @@ class LoginActivity : AppCompatActivity() {
         }else{
             Toast.makeText(this,"Please enter all field ...", Toast.LENGTH_SHORT).show()
         }
-
     }
 }

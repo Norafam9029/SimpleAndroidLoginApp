@@ -83,5 +83,28 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         return count > 0
     }
+
+    fun getUserName(email: String): String? {
+        val db = this.readableDatabase
+        val columns = arrayOf(COL_USER_NAME)
+        val selection = "$COL_USER_EMAIL = ?"
+        val selectionArgs = arrayOf(email)
+        val cursor = db.query(TABLE_USER, columns, selection, selectionArgs, null, null, null)
+
+        val userName: String? = if (cursor.moveToFirst()) {
+            val columnIndex = cursor.getColumnIndex(COL_USER_NAME)
+            if (columnIndex != -1) {
+                cursor.getString(columnIndex)
+            } else {
+                null // Column doesn't exist
+            }
+        } else {
+            null // Cursor is empty
+        }
+        cursor.close()
+        db.close()
+
+        return userName
+    }
 }
 

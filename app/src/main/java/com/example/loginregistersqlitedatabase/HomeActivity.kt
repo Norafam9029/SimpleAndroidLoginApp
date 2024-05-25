@@ -19,14 +19,13 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
         val extraEmail = intent.getStringExtra("EMAIL_DATA")
 
-
         db = DatabaseHelper(this)
+
+        val userName = db.getUserName(extraEmail ?: "")
+        binding.tvPrimaryAccount.text = "Hello $userName"
 
         binding.btnLogout.setOnClickListener{
             startActivity(Intent(this,LoginActivity::class.java))
         }
-
-        binding.tvPrimaryAccount.text = "Your account: $extraEmail"
-
     }
 }

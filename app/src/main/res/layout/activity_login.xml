@@ -56,7 +56,7 @@
             android:id="@+id/text_input_password"
             android:layout_height="wrap_content"
             android:hint="Please enter password"
-            android:inputType="textPassword|textVisiblePassword"
+            android:inputType="textPassword"
             android:maxLines="1"/>
 
     </com.google.android.material.textfield.TextInputLayout>

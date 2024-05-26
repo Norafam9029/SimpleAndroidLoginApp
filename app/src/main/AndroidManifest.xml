@@ -13,6 +13,12 @@
         android:theme="@style/Theme.LoginRegisterSQLiteDatabase"
         tools:targetApi="31">
         <activity
+            android:name=".UpdatePasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BottomSheetMenu"
+            android:exported="false" />
+        <activity
             android:name=".RegisterSuccessfullActivity"
             android:exported="false" />
         <activity

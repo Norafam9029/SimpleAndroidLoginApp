@@ -1,5 +1,6 @@
 package com.example.loginregistersqlitedatabase
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -32,7 +33,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db?.execSQL(DROP_TABLE_USER)
         onCreate(db)
     }
-    fun registerUser(user: User): Boolean {
+    fun addUser(user: User): Boolean {
         if (isEmailExists(user.email)) {
             return false // Email already exists
         }
@@ -47,7 +48,50 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db.close()
         return true
     }
-    fun loginUser(email: String, password: String): Boolean {
+
+    @SuppressLint("Range")
+    fun getAllUser(): List<User> {
+        val columns = arrayOf(COL_USER_ID, COL_USER_EMAIL, COL_USER_NAME, COL_USER_PASSWORD)
+        val sortOrder = "$COL_USER_NAME ASC"
+        val userList = mutableListOf<User>()
+
+        val db = this.readableDatabase
+        val cursor = db.query(TABLE_USER, columns, null, null, null, null, sortOrder)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val user = User()
+                user.id = cursor.getInt(cursor.getColumnIndex(COL_USER_ID))
+                user.username = cursor.getString(cursor.getColumnIndex(COL_USER_NAME))
+                user.email = cursor.getString(cursor.getColumnIndex(COL_USER_EMAIL))
+                user.password = cursor.getString(cursor.getColumnIndex(COL_USER_PASSWORD))
+                userList.add(user)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+
+        return userList
+    }
+
+    fun updateUser(user: User): Boolean {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put(COL_USER_NAME, user.username)
+        values.put(COL_USER_EMAIL, user.email)
+        values.put(COL_USER_PASSWORD, hashPassword(user.password))
+
+        db.update(TABLE_USER, values, "$COL_USER_ID = ?", arrayOf(user.id.toString()))
+        db.close()
+        return true
+    }
+
+    fun deleteUser(user: User) {
+        val db = this.writableDatabase
+        db.delete(TABLE_USER, "$COL_USER_ID = ?", arrayOf(user.id.toString()))
+        db.close()
+    }
+    fun checkUser(email: String, password: String): Boolean {
         val db = this.readableDatabase
         val columns = arrayOf(COL_USER_PASSWORD)
         val selection = "$COL_USER_EMAIL = ?"
@@ -84,6 +128,51 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return count > 0
     }
 
+    @SuppressLint("Range")
+    fun getEmail(username: String): List<User> {
+        val columns = arrayOf(COL_USER_EMAIL)
+        val sortOrder = "$COL_USER_NAME ASC"
+        val userList = mutableListOf<User>()
+
+        val db = this.readableDatabase
+        val selection = "$COL_USER_NAME = ?"
+        val selectionArgs = arrayOf(username)
+        val cursor = db.query(TABLE_USER, columns, selection, selectionArgs, null, null, sortOrder)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val user = User()
+                user.username = cursor.getString(cursor.getColumnIndex(COL_USER_NAME))
+                user.email = cursor.getString(cursor.getColumnIndex(COL_USER_EMAIL))
+                userList.add(user)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+
+        return userList
+    }
+
+    @SuppressLint("Range")
+    fun getUrl(username: String): String {
+        val columns = arrayOf(COL_USER_EMAIL, COL_USER_NAME)
+        val selection = "$COL_USER_NAME = ?"
+        val selectionArgs = arrayOf(username)
+
+        val db = this.readableDatabase
+        val cursor = db.query(TABLE_USER, columns, selection, selectionArgs, null, null, null)
+
+        return if (cursor.moveToFirst()) {
+            cursor.getString(cursor.getColumnIndex(COL_USER_EMAIL))
+        } else {
+            ""
+        }.also {
+            cursor.close()
+            db.close()
+        }
+    }
+
+
     fun getUserName(email: String): String? {
         val db = this.readableDatabase
         val columns = arrayOf(COL_USER_NAME)
@@ -105,6 +194,29 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db.close()
 
         return userName
+    }
+
+    fun getUserID(email: String): Int? {
+        val db = this.readableDatabase
+        val columns = arrayOf(COL_USER_ID)
+        val selection = "$COL_USER_EMAIL = ?"
+        val selectionArgs = arrayOf(email)
+        val cursor = db.query(TABLE_USER, columns, selection, selectionArgs, null, null, null)
+
+        val userId: Int? = if (cursor.moveToFirst()) {
+            val columnIndex = cursor.getColumnIndex(COL_USER_ID)
+            if (columnIndex != -1) {
+                cursor.getInt(columnIndex)
+            } else {
+                null // Column doesn't exist
+            }
+        } else {
+            null // Cursor is empty
+        }
+        cursor.close()
+        db.close()
+
+        return userId
     }
 }
 

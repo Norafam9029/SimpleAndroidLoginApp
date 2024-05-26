@@ -46,7 +46,7 @@ class RegisterActivity : AppCompatActivity() {
         ){
             if(ValidationUtils.isValidEmail(email)){
                 val user = User(username = username, email = email.trim(), password = password)
-                val isSuccess = db.registerUser(user)
+                val isSuccess = db.addUser(user)
                 if(isSuccess){
                     Toast.makeText(this,"Registration success!", Toast.LENGTH_LONG).show()
                     val i = Intent(this,RegisterSuccessfullActivity::class.java)

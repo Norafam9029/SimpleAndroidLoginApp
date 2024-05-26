@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
 
         if(ValidationUtils.isTextNotEmpty(email) && ValidationUtils.isTextNotEmpty(password)){
             if(ValidationUtils.isValidEmail(email)){
-                val isSuccess = db.loginUser(email, password)
+                val isSuccess = db.checkUser(email, password)
                 if(isSuccess){
                     Toast.makeText(this,"Login successful", Toast.LENGTH_SHORT).show()
                     val i = Intent(this,HomeActivity::class.java)
